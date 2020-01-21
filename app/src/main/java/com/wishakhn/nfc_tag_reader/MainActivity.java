@@ -5,9 +5,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.nfc.FormatException;
+import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.View;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 NfcAdapter nfcAdapter;
@@ -20,6 +28,7 @@ NfcAdapter nfcAdapter;
 
     private void initView() {
         nfcAdapter = NfcAdapter.getDefaultAdapter(MainActivity.this);
+
     }
 
     public void NFCHandler(View view) {
@@ -61,4 +70,56 @@ NfcAdapter nfcAdapter;
 
         }
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+        System.err.println("Gave Intent is "+tag);
+        System.err.println("Intent Action is "+intent.getAction());
+        resolveIntent(intent);
+    }
+    private void resolveIntent(Intent intent) {
+        String action = intent.getAction();
+
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+            Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+            NdefMessage[] msgs;
+
+            if (rawMsgs != null) {
+                msgs = new NdefMessage[rawMsgs.length];
+
+                for (int i = 0; i < rawMsgs.length; i++) {
+                    msgs[i] = (NdefMessage) rawMsgs[i];
+                }
+
+            } else {
+                byte[] empty = new byte[0];
+                byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
+                Tag tag = (Tag) intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+                Ndef ndef = Ndef.get(tag);
+                readFromNFC(ndef);
+            }
+
+        }
+    }
+    private String readFromNFC(Ndef ndef) {
+
+        try {
+            ndef.connect();
+            NdefMessage ndefMessage = ndef.getNdefMessage();
+            String message = new String(ndefMessage.getRecords()[0].getPayload());
+            Log.d("TAG", "readFromNFC: "+message);
+            ndef.close();
+            return message;
+        } catch (IOException | FormatException e) {
+            e.printStackTrace();
+
+        }
+        return null;
+    }
+
 }
