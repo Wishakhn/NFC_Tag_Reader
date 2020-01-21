@@ -14,11 +14,15 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 NfcAdapter nfcAdapter;
+String tagOInfo_str ="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,8 +38,10 @@ NfcAdapter nfcAdapter;
     public void NFCHandler(View view) {
         switch (view.getId()){
             case R.id.startbtn:
+                resolveIntent(getIntent());
                 break;
             case R.id.stopbtn:
+                finish();
                 break;
         }
     }
@@ -97,13 +103,13 @@ NfcAdapter nfcAdapter;
                 }
 
             } else {
-                byte[] empty = new byte[0];
-                byte[] id = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
                 Tag tag = (Tag) intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
                 Ndef ndef = Ndef.get(tag);
-                readFromNFC(ndef);
+               tagOInfo_str=readFromNFC(ndef);
             }
-
+            Intent move = new Intent(MainActivity.this, TextViewer.class);
+            move.putExtra("msgfromNfc",tagOInfo_str);
+            startActivity(move);
         }
     }
     private String readFromNFC(Ndef ndef) {

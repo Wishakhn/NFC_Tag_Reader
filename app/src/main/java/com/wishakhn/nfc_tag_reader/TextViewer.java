@@ -23,7 +23,7 @@ Intent intent;
     }
     private void setListner() {
         if (intent != null){
-            String msg_is = intent.getStringExtra("msg");
+            String msg_is = intent.getStringExtra("msgfromNfc");
             getdatatext.setText(msg_is);
         }
         else {
