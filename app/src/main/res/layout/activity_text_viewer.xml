@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TextViewer">
+    <include layout="@layout/back_image"/>
+    <TextView
+        android:id="@+id/getdatatext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:padding="20dp"
+        android:textColor="#FFFF"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:text="Readed Data from NFC"
+        android:layout_marginHorizontal="30dp"
+        android:background="#A95D5F5F"/>
+
+</RelativeLayout>
